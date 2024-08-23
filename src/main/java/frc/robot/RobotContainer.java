@@ -54,9 +54,9 @@ public class RobotContainer {
     public final Drivertrain m_drivertrain = new Drivertrain();
     public final Intake m_intake = new Intake();
 // Joysticks
-private final Joystick co_DriverController = new Joystick(1);
+// private final Joystick co_DriverController = new Joystick(1);
 private final CommandXboxController driverControler = new CommandXboxController(0);
-private final XboxController m_otherDriverController = new XboxController(2);
+private final XboxController m_operatorController = new XboxController(1);
 
 private ShuffleboardTab teleopTab = Shuffleboard.getTab("TeleOp");
 private ShuffleboardTab AutoTab = Shuffleboard.getTab("Autonomous");
@@ -96,9 +96,9 @@ private SendableChooser<String> autoChooser = new SendableChooser<>();
         //                                               () -> driverControler.getRawAxis(2), m_drivertrain));
 
 
-    m_drivertrain.setDefaultCommand(new DriveWithJoy(() -> -m_otherDriverController.getLeftY(), 
-                                                      () -> m_otherDriverController.getRightX(), m_drivertrain));
-    m_armElevator.setDefaultCommand(new ArmElevatorRun(() -> MathUtil.applyDeadband(co_DriverController.getRawAxis(0), 0.30), m_armElevator));
+    m_drivertrain.setDefaultCommand(new DriveWithJoy(() -> -m_operatorController.getLeftY(), 
+                                                      () -> m_operatorController.getRightX(), m_drivertrain));
+    m_armElevator.setDefaultCommand(new ArmElevatorRun(() -> MathUtil.applyDeadband(m_operatorController.getRightY(), 0.30), m_armElevator));
     
     LimelightHelpers.setCameraMode_Driver("limelight");
     teleopTab.addCamera("driverCamera", "limelight", "http://10.88.78.11:5800/stream.mjpg"); //https://10.60.45.11:5800
@@ -146,8 +146,8 @@ private SendableChooser<String> autoChooser = new SendableChooser<>();
 // final JoystickButton rel_Button = new JoystickButton(co_DriverController, 6);        
 // rel_Button.whileTrue(new IntakeOutCommand(m_intake));
 
-new Trigger(()->co_DriverController.getRawButton(5)).whileTrue(new IntakeInCommand(m_intake));
-new Trigger(()->co_DriverController.getRawButton(6)).whileTrue(new IntakeOutCommand(m_intake));
+new Trigger(()->m_operatorController.getRightTriggerAxis() > 0).whileTrue(new IntakeInCommand(m_intake));
+new Trigger(()->m_operatorController.getLeftTriggerAxis() > 0).whileTrue(new IntakeOutCommand(m_intake));
                         
 // final JoystickButton extensionRetract_Btn = new JoystickButton(co_DriverController, 4);        
 // extensionRetract_Btn.whileTrue(new ArmExtensionRun(() -> -1, m_armExtension).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
@@ -165,9 +165,9 @@ new Trigger(()->co_DriverController.getRawButton(6)).whileTrue(new IntakeOutComm
 // runAutoBalance.onTrue(new AutoBalanceAlternate(m_drivertrain));
 
 
-new JoystickButton(m_otherDriverController, XboxController.Button.kB.value).onTrue(new AutoBalanceAlternate(m_drivertrain));
-new JoystickButton(m_otherDriverController, XboxController.Button.kY.value).onTrue(new SetBrakeMode(m_drivertrain));
-new JoystickButton(m_otherDriverController, XboxController.Button.kA.value).onTrue(new SetCoastMode(m_drivertrain));
+new JoystickButton(m_operatorController, XboxController.Button.kB.value).onTrue(new AutoBalanceAlternate(m_drivertrain));
+new JoystickButton(m_operatorController, XboxController.Button.kY.value).onTrue(new SetBrakeMode(m_drivertrain));
+new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new SetCoastMode(m_drivertrain));
 
 
 
@@ -184,9 +184,9 @@ public XboxController getDriverControler() {
       return driverControler.getHID();
     }
 
-public Joystick getCo_DriverController() {
-        return co_DriverController;
-    }
+// public Joystick getCo_DriverController() {
+//         return co_DriverController;
+//     }
 
 public void setCoast(){
   m_drivertrain.setCoast();
